@@ -1,0 +1,121 @@
+<div class="svg-canvas-wrapper">
+  <svg
+    viewBox="0 0 600 340"
+    width="100%"
+    height="100%"
+    preserveAspectRatio="xMidYMid meet"
+    style="display:block;"
+  >
+    <defs>
+      <radialGradient id="canvas-fade-gradient" cx="50%" cy="50%" r="80%">
+        <stop offset="0%" stop-color="#fff" stop-opacity="1" />
+        <stop offset="40%" stop-color="#fff" stop-opacity="1" />
+        <stop offset="50%" stop-color="#fff" stop-opacity="1" />
+        <stop offset="60%" stop-color="#fff" stop-opacity="0" />
+        <stop offset="70%" stop-color="#fff" stop-opacity="0" />
+        <stop offset="80%" stop-color="#fff" stop-opacity="0" />
+        <stop offset="90%" stop-color="#fff" stop-opacity="0" />
+        <stop offset="100%" stop-color="#fff" stop-opacity="0" />
+      </radialGradient>
+      <mask id="canvas-fade-mask">
+        <rect x="0" y="0" width="600" height="340" fill="url(#canvas-fade-gradient)" />
+      </mask>
+    </defs>
+    <g [attr.mask]="!showDebugLabels ? 'url(#canvas-fade-mask)' : null">
+      <!-- Background (solid blue rectangle behind all content) -->
+      <rect x="0" y="0" width="600" height="340" fill="#1976d2" />
+      <!-- Sky (background is now solid blue via parent div) -->
+      <!-- Grass (solid color, not a gradient) -->
+      <rect x="0" y="220" width="600" height="120" [attr.fill]="grassColor" />
+      <!-- Waves (across the full width, on top of grass but below road) -->
+      <g id="waves-group" transform="translate(0,180)">
+        <svg #waves id="waves" width="600" height="40" viewBox="0 0 600 40">
+          <path id="wavePath" d="M0,20 Q100,0 200,20 T400,20 T600,20 V40 H0 Z" [attr.fill]="waveColor" />
+        </svg>
+      </g>
+      <!-- Road (curved SVG for more natural look) -->
+      <g>
+        <rect x="0" y="275" width="600" height="15" [attr.fill]="roadColor" />
+        <line x1="20" y1="280" x2="580" y2="280" [attr.stroke]="roadDashColor" stroke-width="3" stroke-dasharray="20,20" />
+      </g>
+      <!-- Cyclist (centered horizontally, just above the road) -->
+      <g id="cyclist-group" #cyclist transform="translate(100,196)">
+        <!-- Bike frame (blue) -->
+        <g id="bike-frame" [attr.stroke]="bikeColor" stroke-width="4" fill="none">
+          <!-- Wheels (dark grey, thinner stroke, more realistic size) -->
+          <circle id="wheelBack" cx="25" cy="65" r="14" [attr.stroke]="wheelColor" stroke-width="2.5" fill="none" />
+          <circle id="wheelFront" cx="75" cy="65" r="14" [attr.stroke]="wheelColor" stroke-width="2.5" fill="none" />
+          <!-- Spokes for back wheel (more spokes, from TS) -->
+          <g id="spokesBack">
+            @for (spoke of backSpokes; track spoke) {
+              <line [attr.x1]="spoke.x1" [attr.y1]="spoke.y1" [attr.x2]="spoke.x2" [attr.y2]="spoke.y2" [attr.stroke]="wheelColor" stroke-width="1" />
+            }
+          </g>
+          <!-- Spokes for front wheel (more spokes, from TS) -->
+          <g id="spokesFront">
+            @for (spoke of frontSpokes; track spoke) {
+              <line [attr.x1]="spoke.x1" [attr.y1]="spoke.y1" [attr.x2]="spoke.x2" [attr.y2]="spoke.y2" [attr.stroke]="wheelColor" stroke-width="1" />
+            }
+          </g>
+          <!-- Frame: diamond geometry (lower seat, reconnect arms, fix knees) -->
+          <line x1="25" y1="65" x2="48" y2="43" [attr.stroke]="bikeColor" /> <!-- seat stay: rear wheel to seat/top (lowered) -->
+          <line x1="25" y1="65" x2="48" y2="65" [attr.stroke]="bikeColor" /> <!-- chain stay: rear wheel to bottom bracket -->
+          <line x1="48" y1="43" x2="73" y2="39" [attr.stroke]="bikeColor" /> <!-- top tube: seat/top to head tube -->
+          <line x1="48" y1="43" x2="48" y2="65" [attr.stroke]="bikeColor" /> <!-- seat tube: seat/top to bottom bracket -->
+          <line x1="48" y1="65" x2="73" y2="39" [attr.stroke]="bikeColor" /> <!-- down tube: bottom bracket to head tube -->
+          <!-- Seat (lowered to y=39) -->
+          <rect x="44" y="39" width="8" height="4" rx="2" [attr.fill]="bikeColor" stroke="none" />
+        </g>
+        <!-- Stick figure (butt on seat, arms reconnected, knees halfway down) -->
+        <g id="stick-figure" [attr.stroke]="stickmanColor" stroke-width="3" fill="none" stroke-linecap="round">
+          <circle id="head" cx="52" cy="20" r="5" [attr.fill]="stickmanColor" />
+          <line id="body" x1="52" y1="25" x2="48" y2="43" /> <!-- torso, leaning forward, lowered butt -->
+          <!-- Butt on seat -->
+          <circle id="butt" cx="48" cy="43" r="1.5" [attr.fill]="stickmanColor" /> <!-- lowered butt -->
+          <!-- Arms (shoulder at top of torso) -->
+          <line id="armL" x1="50" y1="35" x2="68" y2="34" />
+          <line id="armR" x1="50" y1="35" x2="82" y2="34" />
+          <!-- Legs: knees halfway down -->
+          <line id="thighL" x1="48" y1="43" x2="46" y2="54" /> <!-- left thigh, knee halfway -->
+          <line id="shinL" x1="46" y1="54" [attr.x2]="pedalL.x" [attr.y2]="pedalL.y" /> <!-- left shin ends at pedal -->
+          <circle id="footL" [attr.cx]="pedalL.x" [attr.cy]="pedalL.y" r="1.8" [attr.fill]="stickmanColor" /> <!-- left foot at pedal -->
+          <line id="thighR" x1="48" y1="43" x2="50" y2="54" /> <!-- right thigh, knee halfway -->
+          <line id="shinR" x1="50" y1="54" [attr.x2]="pedalR.x" [attr.y2]="pedalR.y" /> <!-- right shin ends at pedal -->
+          <circle id="footR" [attr.cx]="pedalR.x" [attr.cy]="pedalR.y" r="1.8" [attr.fill]="stickmanColor" /> <!-- right foot at pedal -->
+        </g>
+        <!-- Pedal cranks (pedals equidistant from crank center for proper rotation) -->
+        <g id="pedals" [attr.stroke]="bikeColor" stroke-width="2.2">
+          <circle id="crank" cx="48" cy="65" r="2.2" [attr.fill]="bikeColor" />
+          <line id="pedalL" x1="48" y1="65" [attr.x2]="pedalL.x" [attr.y2]="pedalL.y" /> <!-- left pedal: animated from TS -->
+          <line id="pedalR" x1="48" y1="65" [attr.x2]="pedalR.x" [attr.y2]="pedalR.y" /> <!-- right pedal: animated from TS -->
+        </g>
+        <!-- Handlebar (raised) -->
+        <g id="handlebar" [attr.stroke]="bikeColor" stroke-width="4" fill="none">
+          <line x1="75" y1="65" x2="73" y2="37" /> <!-- handlebar stem -->
+          <line x1="74" y1="37" x2="82" y2="34" /> <!-- right handlebar -->
+          <line x1="75" y1="37" x2="66" y2="34" /> <!-- left handlebar-->
+        </g>
+      </g>
+      <!-- Rose Petals (above everything) -->
+      <g id="petals-group">
+        @for (petal of petals; track petal) {
+          <svg class="petal" width="20" height="20" viewBox="0 0 20 20">
+            <!-- Realistic rose petal shape -->
+            <path d="M10 2 Q16 4 14 12 Q13 18 10 18 Q7 18 6 12 Q4 4 10 2 Z" [attr.fill]="petalColor" [attr.opacity]="petal.opacity" />
+          </svg>
+        }
+      </g>
+      <!-- Debug: Canvas Borders with Axis Labels and Dots -->
+      @if (showDebugLabels) {
+        <text x="0" y="15" font-size="16" [attr.fill]="stickmanColor">x=0, y=0</text>
+        <circle cx="0" cy="0" r="4" [attr.fill]="petalColor" />
+        <text x="600" y="15" font-size="16" [attr.fill]="stickmanColor" text-anchor="end">x=600, y=0</text>
+        <circle cx="600" cy="0" r="4" [attr.fill]="petalColor" />
+        <text x="0" y="340" font-size="16" [attr.fill]="stickmanColor">x=0, y=340</text>
+        <circle cx="0" cy="340" r="4" [attr.fill]="petalColor" />
+        <text x="600" y="340" font-size="16" [attr.fill]="stickmanColor" text-anchor="end">x=600, y=340</text>
+        <circle cx="600" cy="340" r="4" [attr.fill]="petalColor" />
+      }
+    </g>
+  </svg>
+</div>
