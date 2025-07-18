@@ -6,6 +6,18 @@ body, html {
   overflow-x: hidden;
 }
 
+@supports (width: 100dvw) {
+  body, html {
+    width: 100dvw;
+  }
+}
+
+@supports (height: 100dvh) {
+  body, html {
+    height: 100dvh;
+  }
+}
+
 .bg-canvas {
   position: absolute;
   width: calc(100vw - var(--scrollbar-width, 0px));
@@ -13,6 +25,19 @@ body, html {
   z-index: -1;
   pointer-events: none;
 }
+
+@supports (width: 100dvw) {
+  .bg-canvas {
+    width: calc(100dvw - var(--scrollbar-width, 0px));
+  }
+}
+
+@supports (height: 100dvh) {
+  .bg-canvas {
+    height: 100dvh;
+  }
+}
+
 .hero-section {
   position: relative;
   overflow: hidden;
@@ -40,6 +65,12 @@ body, html {
   padding: 0 2rem;
   box-sizing: border-box;
   z-index: 2;
+}
+
+@supports (min-height: 100dvh) {
+  .hero-section, .info-section, .cta-section {
+    min-height: 100dvh;
+  }
 }
 
 .hero-title, .hero-title-top, .hero-title-bottom {
